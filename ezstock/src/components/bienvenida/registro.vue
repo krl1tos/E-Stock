@@ -56,6 +56,11 @@
   import { ref } from 'vue';
   import { inject } from 'vue';
   
+  const scrFunciones = document.createElement("script")
+  scrFunciones.setAttribute("src",'/js/funciones.js' )
+  document.head.appendChild(scrFunciones)
+
+
   const colorDetalles = inject('colorDetalles')
   const inputs = ref([
    {ID:"Nombre", columnas:12, label:"Nombre"},
@@ -64,4 +69,85 @@
    {ID:"RepetirContraseña", columnas:12, label:"Repetir Contraseña", type:"password", md:6, sm:6,},
 
   ])
+
+    //Funcion para enviar los datos del formulario
+    function registrarse() {
+    //Recoge los datos del formulario.
+    const nombreInput = document.getElementById("Nombre").value
+    const emailInput = document.getElementById("Email").value
+    const passInput = document.getElementById("Contraseña").value
+    const passInput2 = document.getElementById("RepetirContraseña").value
+    
+    
+    //Chequea que el nombre no este vacio.
+    if(emailInput === '') {
+        alert('El campo email es obligatorio');
+        return;
+    }
+    
+    if(nombreInput === '') {
+        alert('El campo nombre es obligatorio');
+        return;
+    }
+
+    if(passInput === '') {
+        alert('El campo contraseña es obligatorio');
+        return;
+    }
+
+    if(passInput !== passInput2){
+      alert('Las contraseñas no coinsiden')
+      return;
+    }
+
+    //Crea una variable para los datos del formulario.
+    let datos = {};
+
+    //Guarda los datos en la VARIABLE datos.
+    datos.email=emailInput;
+    datos.nombre=nombreInput;    
+    
+    let usuario = {
+        usuario:datos
+    }
+    //datos.pass=passInput;
+
+
+
+    
+    enviarAlServidor(usuario)
+    .then(res => {
+        clave_pub=res.Respuesta.datos.clave_pub
+        password=passInput
+
+        console.log("clave_pub:"+clave_pub)
+         
+
+        passConClave= mezclarStrings(passInput,clave_pub)//password+'-'+clave_pub
+        hashPass=generarHash(passConClave)
+        console.log(emailInput)
+        datos.nombre=nombreInput
+        datos.email=emailInput
+        datos.hash_contra=hashPass
+        usuario.usuario=datos 
+
+         enviarAlServidor(usuario)
+        .then(res => {
+            console.log(res)
+            const pEstado = document.createElement("p")
+            pEstado.innerHTML=res.Respuesta.estado+": "+res.Respuesta.datos.mensaje
+            divEstado.appendChild(pEstado)
+        }) 
+    }); 
+
+        //Envia los datos al php para subir los datos.
+        fetch("http://localhost/usuario-main/crear/crear.php", {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+        },
+      body: JSON.stringify(usuario)  
+    });
+  }
 </script>
