@@ -25,7 +25,7 @@
 
         <v-col>
           <v-spacer></v-spacer>
-          <v-btn id="btn-crearCuenta" variant="tonal" class="mr-5">
+          <v-btn id="btn-crearCuenta" @click="registrarse()" variant="tonal" class="mr-5">
             Crear Cuenta
           </v-btn>
         </v-col>
@@ -60,6 +60,9 @@
   scrFunciones.setAttribute("src",'/js/funciones.js' )
   document.head.appendChild(scrFunciones)
 
+  const scrSha512 = document.createElement("script")
+  scrSha512.setAttribute("src",'/js/sha512.js' )
+  document.head.appendChild(scrSha512)
 
   const colorDetalles = inject('colorDetalles')
   const inputs = ref([
@@ -115,39 +118,40 @@
 
 
     
-    enviarAlServidor(usuario)
+    enviarAlServidor(usuario,"http://localhost/Usuario-main/crear/crear.php")
     .then(res => {
-        clave_pub=res.Respuesta.datos.clave_pub
-        password=passInput
+      console.log(res.Respuesta.datos.clave_pub)  
+      let clave_pub=res.Respuesta.datos.clave_pub
+      let password=passInput
 
         console.log("clave_pub:"+clave_pub)
          
 
-        passConClave= mezclarStrings(passInput,clave_pub)//password+'-'+clave_pub
-        hashPass=generarHash(passConClave)
+        let passConClave= mezclarStrings(passInput,clave_pub)//password+'-'+clave_pub
+        let hashPass=generarHash(passConClave)
         console.log(emailInput)
         datos.nombre=nombreInput
         datos.email=emailInput
         datos.hash_contra=hashPass
         usuario.usuario=datos 
 
-         enviarAlServidor(usuario)
+         enviarAlServidor(usuario,"http://localhost/Usuario-main/crear/crear.php")
         .then(res => {
             console.log(res)
             const pEstado = document.createElement("p")
             pEstado.innerHTML=res.Respuesta.estado+": "+res.Respuesta.datos.mensaje
-            divEstado.appendChild(pEstado)
+            //divEstado.appendChild(pEstado)
         }) 
     }); 
 
         //Envia los datos al php para subir los datos.
-        fetch("http://localhost/usuario-main/crear/crear.php", {
-      method: "POST",
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-        },
-      body: JSON.stringify(usuario)  
-    });
+        //fetch("http://localhost/usuario-main/crear/crear.php", {
+      //method: "POST",
+      //headers: {
+        //'Accept': 'application/json, text/plain, */*',
+        //'Content-Type': 'application/json'
+       // },
+      //body: JSON.stringify(usuario)  
+   // });
   }
 </script>

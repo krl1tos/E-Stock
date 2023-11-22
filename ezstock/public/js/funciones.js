@@ -1,8 +1,8 @@
 
 
-  const urlValidarSesion = 'http://localhost/usuario-main/login/validar_sesion.php'
-  const urlLogin = 'http://localhost/usuario-main/login/login.php'
-  const urlLogout = 'http://localhost/usuario-main/login/logout.php'
+  //const urlValidarSesion = 'http://localhost/usuario-main/login/validar_sesion.php'
+  //const urlLogin = 'http://localhost/usuario-main/login/login.php'
+  //const urlLogout = 'http://localhost/usuario-main/login/logout.php'
 
   /**
    * Permite generar un hash con la contraseña proporcionada por el usuario
