@@ -118,7 +118,7 @@
 
 
     
-    enviarAlServidor(usuario,"http://localhost/Usuario-main/crear/crear.php")
+    enviarAlServidor(usuario,"http://localhost/API/crear.php")
     .then(res => {
       console.log(res.Respuesta.datos.clave_pub)  
       let clave_pub=res.Respuesta.datos.clave_pub
@@ -135,7 +135,7 @@
         datos.hash_contra=hashPass
         usuario.usuario=datos 
 
-         enviarAlServidor(usuario,"http://localhost/Usuario-main/crear/crear.php")
+         enviarAlServidor(usuario,"http://localhost/API/crear.php")
         .then(res => {
             console.log(res)
             const pEstado = document.createElement("p")

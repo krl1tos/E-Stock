@@ -40,6 +40,7 @@
 <script setup>
 
   const items= [
+    {src: 'src/assets/images/Bienvenida/carrusel/todoelequipo.png',},
     {src: 'src/assets/images/Bienvenida/carrusel/tresDesarrolladoresTrabajando.YUnIndividuo.jpg',},
     {src: 'src/assets/images/Bienvenida/carrusel/dosDesarolladoresEnPizarra.jpg',},
     {src: 'src/assets/images/Bienvenida/carrusel/dosDesarrolladoresDocumentado.jpg',},

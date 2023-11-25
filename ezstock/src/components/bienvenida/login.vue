@@ -28,7 +28,7 @@
             <v-spacer></v-spacer>
             <v-btn
               variant="tonal"
-              id="btn-Iniciar"
+              id="btnLogin"
               text="Iniciar"
               @click="isActive.value = false; enviarDatos(); console.log(form)"
             />
@@ -59,10 +59,10 @@
 .texto{
   padding: 0px;
 }
-#btn-Iniciar {
+#btnLogin {
   color: white;
 }
-#btn-Iniciar:hover{
+#btnLogin:hover{
   color: #2196F3;
 }
 </style>

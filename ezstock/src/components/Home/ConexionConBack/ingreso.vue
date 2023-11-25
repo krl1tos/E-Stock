@@ -142,10 +142,15 @@ const inputNuevoTipo = ref()
 const inputNuevoProductoImagen = ref()
 const inputCantidad = ref()
 
-
 function encontrarRutaPorCodigo(codigo) {
     const productoEncontrado = productos.find(producto => producto.codigo === codigo);
     return productoEncontrado ? productoEncontrado.rutaIMG : null;
 }
+
+//      FORMULARIO        //
+
+  function nuevoprod() {
+    
+  }
 
 </script>
