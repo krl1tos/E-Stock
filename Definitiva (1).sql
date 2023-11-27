@@ -104,7 +104,7 @@ delimiter //
     CREATE PROCEDURE agregarProducto(
         IN Ptipo VARCHAR(255),
         IN pNombre VARCHAR(255),
-        IN prutaIMG VARCHAR(255)
+        IN prutaIMG VARCHAR(255),
         IN Email VARCHAR(255)
         )
         
