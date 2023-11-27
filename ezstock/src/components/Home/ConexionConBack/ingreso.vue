@@ -77,7 +77,7 @@
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn class="btn" @click="dialogo = false">Cancelar</v-btn>
-                <v-btn class="btn" color="blue" variant="tonal" @click="submitForm">Registrar</v-btn>
+                <v-btn class="btn" color="blue" variant="tonal" @click="Ingresar()">Registrar</v-btn>
                 <v-spacer></v-spacer>
             </v-card-actions>
         </v-card>
@@ -154,7 +154,7 @@ function encontrarRutaPorCodigo(codigo) {
 
 //      FORMULARIO        //
 
-  function nuevoprod() {
+  function Ingresar() {
     
     const TipoMov = "entrada";
     const NombreProd = document.getElementById("NomProducto").value;
@@ -162,24 +162,29 @@ function encontrarRutaPorCodigo(codigo) {
     const RutaIMG = document.getElementById("URLimg").value;
     const Cantidad = document.getElementById("Cantidad").value;
 console.log(NombreProd)
-    let datosProducto = {};
+    let datosProducto = {
 
-    datosProducto.NombreProd=NombreProd
-    datosProducto.TipoProd=TipoProd
-    datosProducto.RutaIMG=RutaIMG
-    datosProducto.Cantidad=Cantidad
+      TipoMov: TipoMov,
+      nombre: NombreProd,
+      tipo: TipoProd,
+      rutaimg: RutaIMG,
+      cantidad: Cantidad
+
+    };
+
+  
 
     if (NombreProd == ""){
       alert ("Ingrese un nombre al producto")
     }
 
-    fetch("http://localhost/api/Producto/subirprod.php",{
+    fetch("http://localhost/API/Productos/subirprod2.php",{
         method: "POST",
         headers: {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
         },
-        body: (datosProducto)
+        body: JSON.stringify(datosProducto)
     }); 
 
 
