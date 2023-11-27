@@ -23,6 +23,7 @@
                             v-model="inputNuevoProductoNombre" 
                             label="Nombre"
                             messages="Ingrese el nombre del nuevo producto"
+                            id="NomProducto"
                             />
                         <v-autocomplete
                             color="blue"
@@ -34,6 +35,7 @@
                             item-value="tipo"
                             clearable
                             @input="filterProductTypes"
+                            
                             />
                         <v-text-field 
                             class="btn-padding" color="blue"
@@ -41,6 +43,7 @@
                             v-model="inputNuevoTipo" 
                             label="Nombre del Nuevo Tipo"
                             messages="Ingrese el nombre del nuevo tipo de producto"
+                            id="TipoProducto"
                             />
                         <v-file-input
                             color="blue"
@@ -48,12 +51,14 @@
                             v-model="inputNuevoProductoImagen"
                             label="Imagen o foto del producto"
                             accept=".png, .jpeg, .jpg"
+                            id="URLimg"
                             />
                         <v-text-field
                             color="blue"
                             v-model="inputCantidad" 
                             label="Cantidad" 
                             type="number"
+                            id="Cantidad"
                             />
                     </v-form>
                 </div>
@@ -151,6 +156,35 @@ function encontrarRutaPorCodigo(codigo) {
 
   function nuevoprod() {
     
+    const TipoMov = "entrada";
+    const NombreProd = document.getElementById("NomProducto").value;
+    const TipoProd = document.getElementById("TipoProducto").value;
+    const RutaIMG = document.getElementById("URLimg").value;
+    const Cantidad = document.getElementById("Cantidad").value;
+console.log(NombreProd)
+    let datosProducto = {};
+
+    datosProducto.NombreProd=NombreProd
+    datosProducto.TipoProd=TipoProd
+    datosProducto.RutaIMG=RutaIMG
+    datosProducto.Cantidad=Cantidad
+
+    if (NombreProd == ""){
+      alert ("Ingrese un nombre al producto")
+    }
+
+    fetch("http://localhost/api/Producto/subirprod.php",{
+        method: "POST",
+        headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+        },
+        body: (datosProducto)
+    }); 
+
+
+
+
   }
 
 </script>
