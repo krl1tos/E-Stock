@@ -117,6 +117,7 @@ delimiter //
        SELECT last_insert_id() INTO pcodigo;
 
         INSERT INTO posee (user_email, codigo) VALUES (Email, pcodigo);
+        select pcodigo as 'codigo';
  
     END //
 

@@ -161,17 +161,16 @@ function encontrarRutaPorCodigo(codigo) {
     const TipoProd = document.getElementById("TipoProducto").value;
     const RutaIMG = document.getElementById("URLimg").value;
     const Cantidad = document.getElementById("Cantidad").value;
-console.log(NombreProd)
     let datosProducto = {
 
       TipoMov: TipoMov,
       nombre: NombreProd,
       tipo: TipoProd,
       rutaimg: RutaIMG,
-      cantidad: Cantidad
-
+      cantidad: Cantidad,
     };
 
+    console.log(datosProducto);
   
 
     if (NombreProd == ""){
