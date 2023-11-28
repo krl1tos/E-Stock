@@ -1,0 +1,279 @@
+<?php
+
+    //include_once "../123.php";
+    include_once "./usuario_general.php";
+    include_once "./bdd.php";
+    include_once "./basededatos.php";
+    //include_once "../base/index.php";
+    
+
+
+    /* --- EJECUCIÓN --- */
+
+
+
+   //echo(hashear("algo","otro"));
+//1 - Recepción de los datos diréctamente del input
+$datos = file_get_contents('php://input');
+//var_dump($datos);
+//2 - Si los datos recibidos no son vacíos, procedemos a validarlos
+if ( ! empty($datos) ) {
+    //Validación de los datos
+    //var_dump($datos);
+    //$datosValidados = validarPost($datos);
+    
+    //Decodificación de los datos: convertimos el string json en un objeto de "clase genérica"
+    $objetoJson = json_decode("$datos"); //("$datosValidados");
+    //var_dump($objetoJson);
+    //Creamos un nuevo objeto para contener los datos del usuario
+    $usuario = new Usuario;
+    
+    //Pasamos los datos del objeto genérico al objeto usuario
+    $usuario->nombre = $objetoJson->usuario->nombre;
+    $usuario->email = $objetoJson->usuario->email;
+    
+    
+    //Chequeamos si el objeto contiene un hash de contraseña
+    if (isset($objetoJson->usuario->hash_contra)) {
+        $usuario->hash_contra = $objetoJson->usuario->hash_contra;
+    }
+    else {
+        $usuario->hash_contra = null;
+    }
+    
+    $respuesta = crearUsuario($usuario);
+    
+    respuestaJSON($respuesta);
+
+}
+else {
+   // accesoInadecuado();
+   
+}
+
+/** FUNCIONES **/
+
+
+    /**
+     * Permite guiar el proceso de creación y registro de usuarios en el
+     * sistema.
+     * @param Usuario $usuario Un objeto de clase usuario con los datos de registro
+     * @return $resultado Un objeto de clase Respuesta con los datos del registro o del error
+     */
+    function crearUsuario(Usuario $usuario) {
+        $resultado=new Respuesta;
+        $resultado->datos=new stdClass;
+        //var_dump($usuario);
+        //var_dump(! usuarioExiste($usuario));
+        //$chequeo=;
+        
+        if ( ! usuarioExiste($usuario) ) {
+            //echo("llega acà");
+            $clave_pub=crearSal();
+            //var_dump($usuario);
+            $usuario->clave_pub="$clave_pub";
+            
+            $resultado=guardarUsuario($usuario);
+        }
+        //Hasta Acà FUNCIONA!!! 22 de nov 2023
+        //Over there be dragons
+        else{
+            
+            if (registroIncompleto($usuario)) {
+               // $resultado->datos->recibido=$usuario->hash_contra;
+                $hashContra_Base = $usuario->hash_contra; //--> Viene del Frontend
+                //echo("---> $hashContra_Base");
+                $usuario->clave_priv = crearSal();
+
+                $hashContra = hashear($hashContra_Base,$usuario->clave_priv);
+                $usuario->hash_contra = $hashContra;
+                $resultado = completarRegistro($usuario);
+            } else {
+                $resultado->estado="ERROR";
+               
+                $resultado->datos->mensaje="Ya existe";
+            }
+            
+        }
+        return $resultado;
+    }
+
+
+    /**
+     * Determina si el registro de un usuario es incompleto, para pasar a la fase 2 del registro del mismo.
+     *
+     * @param Usuario $usuario
+     * @return void
+     */
+    function registroIncompleto(Usuario $usuario) {
+        $resultado=false;
+        
+        $bdd = new BaseDeDatos;
+
+        $credenciales = verCredenciales();
+
+        $bdd->iniciarConexion(
+            $credenciales[0],
+            $credenciales[1],
+            $credenciales[2],
+            $credenciales[3]
+        );
+
+        
+        if ($bdd->estado == "OK") {
+            
+            //Si la conexión es correcta, declaramos la consulta con parámetros, indicados por los símbolos de pregunta ----------\/
+            $consulta="select count(*) as conteo from usuario where nombre like ? and clave_priv='null'";
+
+            //Con el método 'prepare' de la conexión para declarar un objeto sentencia
+            $sentencia = $bdd->conexion->prepare($consulta);
+            
+            //Declaramos variables para los términos de búsqueda
+            $termino = "%"."$usuario->nombre"."%";
+            
+            //Con el método bind_param del objeto sentencia, añadimos los términos a los parámetros de la consulta 
+            $sentencia->bind_param("s",$termino);
+            //  bind_param requiere un string con caracteres que indique los tipos de los datos a agregar a los parámetros
+            //      i - int, números enteros
+            //      d - double, número con decimales
+            //      s - string, textos, fechas, otros datos semejantes
+            //      b - blob, paquetes de datos, que se envían en forma fragmentaria, en paquetes
+
+            //Ejecutamos la sentencia con el método 'execute'
+            $sentencia->execute();
+
+            //Declaramos un objeto 'resultado' para  
+            $resultadoBD= $sentencia->get_result();
+
+            if ($resultadoBD->num_rows > 0) {
+                foreach($resultadoBD as $fila){
+                    $cantUsuarios = $fila["conteo"];
+                    if ($cantUsuarios>0) {
+                        //echo("El usuario existe");
+                        $resultado=true;
+                    }
+                }
+            }
+
+        }
+
+        
+        $bdd->cerrarConexion();
+
+        return $resultado;
+    }
+
+
+    /**
+     * Guarda los datos de la fase 1 del registro de un usuario nuevo.
+     * Se almacenan solo el nombre y se genera la clave pública.
+     *
+     * @param Usuario $usuario
+     * @return void un objeto Respuesta con la clave pública del usuario. 
+     */
+    function guardarUsuario(Usuario $usuario){
+        $resultado = new Respuesta;
+        $bdd = new BaseDeDatos;
+
+       
+
+        $credenciales = verCredenciales();
+        //var_dump($credenciales);
+        $bdd->iniciarConexion(
+            $credenciales[0],
+            $credenciales[1],
+            $credenciales[2],
+            $credenciales[3]
+        );
+
+        if ($bdd->estado == "OK") {
+            $consulta = 
+            "INSERT INTO usuario(user_email ,nombre, clave_pub, clave_priv, hashContra)
+            values (?,?,?,?,?)";
+            $sentencia = $bdd->conexion->prepare($consulta);
+            $email=$usuario->email;
+            $nombre=$usuario->nombre;
+            $clave_pub=$usuario->clave_pub;
+            $clave_priv="null";
+            $hashContra="null";
+
+            $sentencia->bind_param("sssss", $email, $nombre, $clave_pub, $clave_priv, $hashContra);
+            //var_dump($nombre);
+
+            $res_sentencia=$sentencia->execute();
+
+            if ( $sentencia->affected_rows>0 ) {
+                $resultado->estado = "OK";
+                $resultado->datos = new stdClass;
+
+                $resultado->datos->mensaje = "usuario creado: fase 1";
+                $resultado->datos->clave_pub = "$clave_pub";
+            }
+            else {
+                $resultado->estado = "ERROR";
+                $resultado->datos = "ocurrió algo:".$sentencia->error;
+            }
+
+        }
+        return $resultado;
+    }
+
+
+    /**
+     * Completa el registro del registro del usuario (fase 2)
+     *
+     * @param Usuario $usuario
+     * @return void
+     */
+    function completarRegistro(Usuario $usuario){
+        $resultado = new Respuesta;
+        $bdd = new BaseDeDatos;
+        //var_dump($usuario);
+        $credenciales = verCredenciales();
+
+        $bdd->iniciarConexion(
+            $credenciales[0],
+            $credenciales[1],
+            $credenciales[2],
+            $credenciales[3]
+        );
+
+        if ($bdd->estado == "OK") {
+            $consulta = 
+            "UPDATE usuario set clave_priv=?, hashContra=?
+            where nombre=? and user_email=?";
+
+            $sentencia = $bdd->conexion->prepare($consulta);
+            $nombre=$usuario->nombre;
+            $clave_priv=$usuario->clave_priv;
+            $hashContra=$usuario->hash_contra;
+            $user_email=$usuario->email;
+
+            $sentencia->bind_param("ssss", $clave_priv, $hashContra ,$nombre,$user_email);
+            $sentencia->execute();
+
+            if ( $sentencia->affected_rows>0 ) {
+                $resultado->estado = "OK";
+                $resultado->datos = new stdClass;
+
+                $resultado->datos->mensaje = "usuario creado: fase 2";
+                $resultado->datos->usuario = $usuario;
+                
+            }
+            else {
+                $resultado->estado = "ERROR";
+                $resultado->datos = "ocurrió algo:".$sentencia->error;
+            }
+
+        }
+        return $resultado;
+    }
+
+
+
+
+
+
+
+
+ ?>
