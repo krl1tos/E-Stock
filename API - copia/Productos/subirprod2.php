@@ -27,7 +27,7 @@ $resultado = $sentencia->get_result();
 
 if ($resultado->num_rows > 0) {
     $cantProds = 0;
-    foreach($resultadoBD as $fila){
+    foreach($conn as $fila){
         $cantProds = $fila["conteo"];
     }
 
@@ -91,7 +91,7 @@ function productoAgregar($conn, $categoria, $nombre, $rutaIMG, $email){
     
     if ($resultado->num_rows > 0) {
         
-        foreach($resultadoBD as $fila){
+        foreach($conn as $fila){
             $res = $fila["codigo"];
         }
     }
