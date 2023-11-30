@@ -1,7 +1,7 @@
 <template>
     <v-card ID="contenedor" elevation="0">
         <div id="img">
-            <h1><strong class="text-h1">E-stock</strong><div class="text-h2">Registra cada paso, observa tu avance.</div></h1>
+            <h1 id="h1"><strong class="text-h1">E-stock</strong><div class="text-h2">Registra cada paso, observa tu avance.</div></h1>
         </div>
     </v-card>
 </template>
