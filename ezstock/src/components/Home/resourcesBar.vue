@@ -3,7 +3,7 @@
         <div id="movimientos">
             <v-menu location="end">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" variant="outlined" id="btnMovimientos" :color="colorDetalles" elevation="1" prepend-icon="fa-plus"> Nuevo Moviemiento</v-btn>
+                    <v-btn v-bind="props" variant="outlined" id="btnMovimientos" :color="colorDetalles" elevation="1" prepend-icon="fa-plus"> Nuevo Movimiento</v-btn>
                   </template>
                   <v-list>
                     <v-list-item>
